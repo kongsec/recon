@@ -1,0 +1,772 @@
+/* ============================================
+   RECON SENTINEL - Advanced Animations
+   Premium Motion Effects & Micro-interactions
+   ============================================ */
+
+/* ============================================
+   Global Animation Variables
+   ============================================ */
+:root {
+    --anim-duration-fast: 0.2s;
+    --anim-duration-normal: 0.4s;
+    --anim-duration-slow: 0.8s;
+    --anim-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --anim-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --anim-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   Reduced Motion Support
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================
+   Scanning Line Effect
+   ============================================ */
+.scanline-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 212, 255, 0.3) 50%, 
+        transparent 100%
+    );
+    animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+    0% { top: 0; opacity: 0; }
+    5% { opacity: 1; }
+    95% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+/* ============================================
+   Radar Sweep Effect
+   ============================================ */
+.radar-sweep {
+    position: relative;
+    overflow: hidden;
+}
+
+.radar-sweep::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(0, 212, 255, 0.1) 30deg,
+        transparent 60deg
+    );
+    transform: translate(-50%, -50%);
+    animation: radarSweep 4s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes radarSweep {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ============================================
+   Glow Pulse Effect
+   ============================================ */
+.glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(0, 212, 255, 0.3),
+                    0 0 10px rgba(0, 212, 255, 0.2),
+                    0 0 15px rgba(0, 212, 255, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.5),
+                    0 0 20px rgba(0, 212, 255, 0.3),
+                    0 0 30px rgba(0, 212, 255, 0.2);
+    }
+}
+
+/* ============================================
+   Signal Wave Animation
+   ============================================ */
+.signal-wave {
+    position: relative;
+}
+
+.signal-wave::before,
+.signal-wave::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-accent-cyan);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: signalWave 2s ease-out infinite;
+}
+
+.signal-wave::after {
+    animation-delay: 1s;
+}
+
+@keyframes signalWave {
+    0% {
+        width: 20px;
+        height: 20px;
+        opacity: 1;
+    }
+    100% {
+        width: 100px;
+        height: 100px;
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   Data Stream Effect
+   ============================================ */
+.data-stream {
+    position: relative;
+    overflow: hidden;
+}
+
+.data-stream::before {
+    content: '01001010 11010101 00101011 10110100';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(0, 212, 255, 0.1);
+    white-space: nowrap;
+    animation: dataStream 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes dataStream {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* ============================================
+   Holographic Shimmer
+   ============================================ */
+.holo-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.holo-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    animation: holoShimmer 3s ease-in-out infinite;
+}
+
+@keyframes holoShimmer {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+}
+
+/* ============================================
+   Terminal Typing Effect
+   ============================================ */
+.typing-effect {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--color-accent-cyan);
+    animation: typing 2s steps(40) 1s forwards,
+               blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink {
+    50% { border-color: transparent; }
+}
+
+/* ============================================
+   Card Hover Effects
+   ============================================ */
+.card-magnetic {
+    transition: transform var(--anim-duration-normal) var(--anim-ease-out);
+}
+
+/* Corner accents on hover */
+.card-corners {
+    position: relative;
+}
+
+.card-corners::before,
+.card-corners::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 2px solid transparent;
+    transition: all var(--anim-duration-normal) var(--anim-ease-out);
+}
+
+.card-corners::before {
+    top: -2px;
+    left: -2px;
+    border-top-color: var(--color-accent-cyan);
+    border-left-color: var(--color-accent-cyan);
+}
+
+.card-corners::after {
+    bottom: -2px;
+    right: -2px;
+    border-bottom-color: var(--color-accent-cyan);
+    border-right-color: var(--color-accent-cyan);
+}
+
+.card-corners:hover::before,
+.card-corners:hover::after {
+    width: 20px;
+    height: 20px;
+}
+
+/* ============================================
+   Button Press Effects
+   ============================================ */
+.btn-press {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform var(--anim-duration-fast) var(--anim-ease-out);
+}
+
+.btn-press:active {
+    transform: translateY(2px) scale(0.98);
+}
+
+.btn-press::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+    );
+    opacity: 0;
+    transition: opacity var(--anim-duration-fast);
+}
+
+.btn-press:hover::after {
+    opacity: 1;
+}
+
+/* ============================================
+   Ripple Effect
+   ============================================ */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(0, 212, 255, 0.4);
+    transform: scale(0);
+    animation: rippleExpand 0.6s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes rippleExpand {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   Stagger Reveal Animation
+   ============================================ */
+.stagger-reveal > * {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.stagger-reveal.active > * {
+    animation: staggerIn var(--anim-duration-normal) var(--anim-ease-out) forwards;
+}
+
+.stagger-reveal.active > *:nth-child(1) { animation-delay: 0s; }
+.stagger-reveal.active > *:nth-child(2) { animation-delay: 0.05s; }
+.stagger-reveal.active > *:nth-child(3) { animation-delay: 0.1s; }
+.stagger-reveal.active > *:nth-child(4) { animation-delay: 0.15s; }
+.stagger-reveal.active > *:nth-child(5) { animation-delay: 0.2s; }
+.stagger-reveal.active > *:nth-child(6) { animation-delay: 0.25s; }
+.stagger-reveal.active > *:nth-child(7) { animation-delay: 0.3s; }
+.stagger-reveal.active > *:nth-child(8) { animation-delay: 0.35s; }
+.stagger-reveal.active > *:nth-child(9) { animation-delay: 0.4s; }
+.stagger-reveal.active > *:nth-child(10) { animation-delay: 0.45s; }
+
+@keyframes staggerIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   Floating Animation
+   ============================================ */
+.float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* ============================================
+   Shake Animation (for errors)
+   ============================================ */
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* ============================================
+   Success Checkmark Animation
+   ============================================ */
+.checkmark-circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    animation: checkmarkStroke 0.6s var(--anim-ease-out) forwards;
+}
+
+.checkmark-check {
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: checkmarkStroke 0.3s var(--anim-ease-out) 0.3s forwards;
+}
+
+@keyframes checkmarkStroke {
+    to { stroke-dashoffset: 0; }
+}
+
+/* ============================================
+   Progress Bar Animation
+   ============================================ */
+.progress-animate {
+    background: linear-gradient(
+        90deg,
+        var(--color-accent-cyan) 0%,
+        var(--color-accent-cyan-dark) 50%,
+        var(--color-accent-cyan) 100%
+    );
+    background-size: 200% 100%;
+    animation: progressShine 2s linear infinite;
+}
+
+@keyframes progressShine {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+/* ============================================
+   Scanning Progress Animation
+   ============================================ */
+.scan-progress {
+    position: relative;
+    overflow: hidden;
+}
+
+.scan-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 212, 255, 0.5),
+        transparent
+    );
+    animation: scanProgress 1.5s ease-in-out infinite;
+}
+
+@keyframes scanProgress {
+    to { left: 100%; }
+}
+
+/* ============================================
+   Severity Indicator Animations
+   ============================================ */
+.severity-pulse-high {
+    animation: severityPulseHigh 1s ease-in-out infinite;
+}
+
+@keyframes severityPulseHigh {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 58, 58, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(255, 58, 58, 0); }
+}
+
+.severity-pulse-medium {
+    animation: severityPulseMedium 1.5s ease-in-out infinite;
+}
+
+@keyframes severityPulseMedium {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(255, 107, 53, 0); }
+}
+
+/* ============================================
+   Waveform Animation
+   ============================================ */
+.waveform {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 20px;
+}
+
+.waveform-bar {
+    width: 3px;
+    background: var(--color-accent-cyan);
+    border-radius: 2px;
+    animation: waveformPulse 1s ease-in-out infinite;
+}
+
+.waveform-bar:nth-child(1) { animation-delay: 0s; height: 40%; }
+.waveform-bar:nth-child(2) { animation-delay: 0.1s; height: 70%; }
+.waveform-bar:nth-child(3) { animation-delay: 0.2s; height: 50%; }
+.waveform-bar:nth-child(4) { animation-delay: 0.3s; height: 90%; }
+.waveform-bar:nth-child(5) { animation-delay: 0.4s; height: 60%; }
+
+@keyframes waveformPulse {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.5); }
+}
+
+/* ============================================
+   Cursor Trail Effect
+   ============================================ */
+.cursor-trail-particle {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: var(--color-accent-cyan);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    animation: cursorTrailFade 0.5s ease-out forwards;
+}
+
+@keyframes cursorTrailFade {
+    0% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0);
+    }
+}
+
+/* ============================================
+   Panel Slide Transitions
+   ============================================ */
+.panel-slide-left {
+    animation: panelSlideLeft var(--anim-duration-normal) var(--anim-ease-out);
+}
+
+@keyframes panelSlideLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.panel-slide-right {
+    animation: panelSlideRight var(--anim-duration-normal) var(--anim-ease-out);
+}
+
+@keyframes panelSlideRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.panel-slide-up {
+    animation: panelSlideUp var(--anim-duration-normal) var(--anim-ease-out);
+}
+
+@keyframes panelSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   Glitch Effect
+   ============================================ */
+.glitch {
+    position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    left: 2px;
+    text-shadow: -2px 0 var(--color-accent-red);
+    clip-path: inset(45% 0 40% 0);
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    left: -2px;
+    text-shadow: 2px 0 var(--color-accent-cyan);
+    clip-path: inset(25% 0 58% 0);
+    animation: glitch-anim-2 2s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+    0% { clip-path: inset(45% 0 40% 0); }
+    20% { clip-path: inset(10% 0 70% 0); }
+    40% { clip-path: inset(60% 0 15% 0); }
+    60% { clip-path: inset(25% 0 55% 0); }
+    80% { clip-path: inset(80% 0 5% 0); }
+    100% { clip-path: inset(35% 0 50% 0); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip-path: inset(25% 0 58% 0); }
+    20% { clip-path: inset(55% 0 25% 0); }
+    40% { clip-path: inset(5% 0 80% 0); }
+    60% { clip-path: inset(70% 0 10% 0); }
+    80% { clip-path: inset(40% 0 45% 0); }
+    100% { clip-path: inset(15% 0 65% 0); }
+}
+
+/* ============================================
+   Matrix Rain Effect (for background)
+   ============================================ */
+.matrix-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.matrix-column {
+    position: absolute;
+    top: -100%;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: rgba(0, 212, 255, 0.15);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    animation: matrixFall linear infinite;
+}
+
+@keyframes matrixFall {
+    to {
+        transform: translateY(200vh);
+    }
+}
+
+/* ============================================
+   Zoom In Animation
+   ============================================ */
+.zoom-in {
+    animation: zoomIn var(--anim-duration-normal) var(--anim-ease-bounce);
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================
+   Fade Scale Animation
+   ============================================ */
+.fade-scale {
+    animation: fadeScale var(--anim-duration-normal) var(--anim-ease-out);
+}
+
+@keyframes fadeScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================
+   Border Draw Animation
+   ============================================ */
+.border-draw {
+    position: relative;
+}
+
+.border-draw::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border: 2px solid transparent;
+    border-top-color: var(--color-accent-cyan);
+    border-right-color: var(--color-accent-cyan);
+    animation: borderDrawTopRight 0.3s ease forwards;
+}
+
+.border-draw::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border: 2px solid transparent;
+    border-bottom-color: var(--color-accent-cyan);
+    border-left-color: var(--color-accent-cyan);
+    animation: borderDrawBottomLeft 0.3s ease 0.3s forwards;
+}
+
+@keyframes borderDrawTopRight {
+    to {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+@keyframes borderDrawBottomLeft {
+    to {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+/* ============================================
+   Number Count Animation
+   ============================================ */
+.count-up {
+    display: inline-block;
+    animation: countPulse 0.3s ease-out;
+}
+
+@keyframes countPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); color: var(--color-accent-cyan); }
+    100% { transform: scale(1); }
+}
+
+/* ============================================
+   Copy Success Animation
+   ============================================ */
+.copy-success {
+    animation: copySuccess 0.5s var(--anim-ease-bounce);
+}
+
+@keyframes copySuccess {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* ============================================
+   Alert Flash Animation
+   ============================================ */
+.alert-flash {
+    animation: alertFlash 0.5s ease-in-out;
+}
+
+@keyframes alertFlash {
+    0%, 100% { background-color: transparent; }
+    50% { background-color: rgba(255, 58, 58, 0.2); }
+}
+
+/* ============================================
+   Notification Badge Bounce
+   ============================================ */
+.badge-bounce {
+    animation: badgeBounce 0.5s var(--anim-ease-bounce);
+}
+
+@keyframes badgeBounce {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
