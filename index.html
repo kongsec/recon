@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RECON SENTINEL | Bug Bounty Intelligence Platform</title>
+    <meta name="description" content="Authorized security research tool for analyzing public urlscan.io data">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor-main"></div>
+    <div class="cursor-trail"></div>
+    
+    <!-- Scanline Overlay -->
+    <div class="scanline-overlay"></div>
+    
+    <!-- Grid Background -->
+    <div class="grid-background"></div>
+    
+    <!-- Boot Sequence -->
+    <div id="boot-sequence" class="boot-sequence">
+        <div class="boot-content">
+            <div class="boot-logo">
+                <svg viewBox="0 0 100 100" class="boot-icon">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="0.5"/>
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="0.5"/>
+                    <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="0.5"/>
+                    <circle cx="50" cy="50" r="8" fill="currentColor"/>
+                    <line x1="50" y1="5" x2="50" y2="20" stroke="currentColor" stroke-width="1"/>
+                    <line x1="50" y1="80" x2="50" y2="95" stroke="currentColor" stroke-width="1"/>
+                    <line x1="5" y1="50" x2="20" y2="50" stroke="currentColor" stroke-width="1"/>
+                    <line x1="80" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="1"/>
+                </svg>
+            </div>
+            <div class="boot-text">
+                <div class="boot-line" data-delay="0">INITIALIZING RECON SENTINEL v3.7.2...</div>
+                <div class="boot-line" data-delay="200">LOADING THREAT ANALYSIS MODULES...</div>
+                <div class="boot-line" data-delay="400">ESTABLISHING SECURE CONNECTION...</div>
+                <div class="boot-line" data-delay="600">CALIBRATING HEURISTIC ENGINE...</div>
+                <div class="boot-line" data-delay="800">MOUNTING INTELLIGENCE DATABASE...</div>
+                <div class="boot-line" data-delay="1000">SYSTEM READY</div>
+            </div>
+            <div class="boot-progress">
+                <div class="boot-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authorization Gate -->
+    <div id="auth-gate" class="auth-gate hidden">
+        <div class="auth-container">
+            <div class="auth-icon">
+                <svg viewBox="0 0 100 100">
+                    <polygon points="50,10 90,30 90,70 50,90 10,70 10,30" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <text x="50" y="58" text-anchor="middle" fill="currentColor" font-size="30">!</text>
+                </svg>
+            </div>
+            <h1 class="auth-title">AUTHORIZED ACCESS REQUIRED</h1>
+            <div class="auth-content">
+                <p class="auth-warning">This tool is designed for <strong>authorized security research only</strong>.</p>
+                <div class="auth-terms">
+                    <h3>Terms of Use</h3>
+                    <ul>
+                        <li>I am an authorized bug bounty hunter or security researcher</li>
+                        <li>I will only analyze targets I am explicitly authorized to test</li>
+                        <li>I understand this tool performs <strong>passive analysis only</strong></li>
+                        <li>I will not use findings for unauthorized access or exploitation</li>
+                        <li>I will follow responsible disclosure practices</li>
+                        <li>I accept full responsibility for my use of this tool</li>
+                    </ul>
+                </div>
+                <div class="auth-disclaimer">
+                    <strong>DISCLAIMER:</strong> This tool only analyzes publicly visible data from urlscan.io. 
+                    It does not scan, exploit, or access any target systems directly.
+                </div>
+            </div>
+            <div class="auth-actions">
+                <button id="auth-decline" class="btn btn-secondary">DECLINE & EXIT</button>
+                <button id="auth-accept" class="btn btn-primary">I ACCEPT - PROCEED</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="main-app hidden">
+        <!-- Top Navigation Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <div class="logo">
+                    <svg viewBox="0 0 40 40" class="logo-icon">
+                        <circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="1"/>
+                        <circle cx="20" cy="20" r="12" fill="none" stroke="currentColor" stroke-width="0.5"/>
+                        <circle cx="20" cy="20" r="4" fill="currentColor"/>
+                        <line x1="20" y1="2" x2="20" y2="8" stroke="currentColor" stroke-width="1"/>
+                        <line x1="20" y1="32" x2="20" y2="38" stroke="currentColor" stroke-width="1"/>
+                        <line x1="2" y1="20" x2="8" y2="20" stroke="currentColor" stroke-width="1"/>
+                        <line x1="32" y1="20" x2="38" y2="20" stroke="currentColor" stroke-width="1"/>
+                    </svg>
+                    <span class="logo-text">RECON<span class="accent">SENTINEL</span></span>
+                </div>
+            </div>
+            <div class="top-bar-center">
+                <div class="system-status">
+                    <span class="status-indicator active"></span>
+                    <span class="status-text">SYSTEM ACTIVE</span>
+                </div>
+                <div class="current-time" id="current-time"></div>
+            </div>
+            <div class="top-bar-right">
+                <button class="nav-btn" id="btn-history" title="History">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12,6 12,12 16,14"/>
+                    </svg>
+                </button>
+                <button class="nav-btn" id="btn-settings" title="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </button>
+                <button class="nav-btn" id="btn-help" title="Help">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Left Panel - Controls -->
+            <aside class="panel panel-left">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        HUNT CONSOLE
+                    </h2>
+                </div>
+                <div class="panel-content">
+                    <!-- Target Input -->
+                    <div class="form-section">
+                        <label class="form-label">TARGET DOMAIN</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="target-domain" class="form-input" placeholder="example.com" autocomplete="off">
+                            <span class="input-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="2" y1="12" x2="22" y2="12"/>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Company Name -->
+                    <div class="form-section">
+                        <label class="form-label">COMPANY / BRAND <span class="optional">(optional)</span></label>
+                        <input type="text" id="company-name" class="form-input" placeholder="Acme Corp">
+                    </div>
+
+                    <!-- Program Name -->
+                    <div class="form-section">
+                        <label class="form-label">PROGRAM / PLATFORM <span class="optional">(optional)</span></label>
+                        <select id="program-platform" class="form-select">
+                            <option value="">Select Platform</option>
+                            <option value="hackerone">HackerOne</option>
+                            <option value="bugcrowd">Bugcrowd</option>
+                            <option value="yeswehack">YesWeHack</option>
+                            <option value="intigriti">Intigriti</option>
+                            <option value="synack">Synack</option>
+                            <option value="other">Other / Direct</option>
+                        </select>
+                    </div>
+
+                    <!-- URL Keyword Filter -->
+                    <div class="form-section">
+                        <label class="form-label">URL KEYWORD FILTER <span class="optional">(optional)</span></label>
+                        <input type="text" id="url-keyword" class="form-input" placeholder="api, admin, etc.">
+                    </div>
+
+                    <!-- File Presets -->
+                    <div class="form-section">
+                        <label class="form-label">
+                            FILE KEYWORDS
+                            <button class="btn-icon" id="btn-select-all" title="Select All">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 11 12 14 22 4"/>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                </svg>
+                            </button>
+                            <button class="btn-icon" id="btn-clear-all" title="Clear All">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                </svg>
+                            </button>
+                        </label>
+                        <div class="preset-categories">
+                            <!-- Config Files -->
+                            <div class="preset-category">
+                                <div class="category-header" data-category="config">
+                                    <span class="category-icon">⚙</span>
+                                    <span>Config Files</span>
+                                    <span class="category-count">0</span>
+                                </div>
+                                <div class="category-items" id="preset-config">
+                                    <label class="preset-item"><input type="checkbox" value="config.js"><span>config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="config.json"><span>config.json</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="app.config.js"><span>app.config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="site-config.js"><span>site-config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="client-config.js"><span>client-config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="public-config.js"><span>public-config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="web-config.json"><span>web-config.json</span></label>
+                                </div>
+                            </div>
+
+                            <!-- Environment Files -->
+                            <div class="preset-category">
+                                <div class="category-header" data-category="env">
+                                    <span class="category-icon">🔐</span>
+                                    <span>Environment</span>
+                                    <span class="category-count">0</span>
+                                </div>
+                                <div class="category-items" id="preset-env">
+                                    <label class="preset-item"><input type="checkbox" value="env.js"><span>env.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="env.json"><span>env.json</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="settings.js"><span>settings.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="constants.js"><span>constants.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="secrets.js"><span>secrets.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="credentials.js"><span>credentials.js</span></label>
+                                </div>
+                            </div>
+
+                            <!-- API Files -->
+                            <div class="preset-category">
+                                <div class="category-header" data-category="api">
+                                    <span class="category-icon">🔗</span>
+                                    <span>API & Endpoints</span>
+                                    <span class="category-count">0</span>
+                                </div>
+                                <div class="category-items" id="preset-api">
+                                    <label class="preset-item"><input type="checkbox" value="api.js"><span>api.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="api-config.js"><span>api-config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="endpoints.js"><span>endpoints.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="routes.js"><span>routes.js</span></label>
+                                </div>
+                            </div>
+
+                            <!-- Bundle Files -->
+                            <div class="preset-category">
+                                <div class="category-header" data-category="bundle">
+                                    <span class="category-icon">📦</span>
+                                    <span>Bundles & Core</span>
+                                    <span class="category-count">0</span>
+                                </div>
+                                <div class="category-items" id="preset-bundle">
+                                    <label class="preset-item"><input type="checkbox" value="app.js"><span>app.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="main.js"><span>main.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="bundle.js"><span>bundle.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="vendor.js"><span>vendor.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="runtime.js"><span>runtime.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="init.js"><span>init.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="bootstrap.js"><span>bootstrap.js</span></label>
+                                </div>
+                            </div>
+
+                            <!-- Cloud & Services -->
+                            <div class="preset-category">
+                                <div class="category-header" data-category="cloud">
+                                    <span class="category-icon">☁</span>
+                                    <span>Cloud & Services</span>
+                                    <span class="category-count">0</span>
+                                </div>
+                                <div class="category-items" id="preset-cloud">
+                                    <label class="preset-item"><input type="checkbox" value="firebase-config.js"><span>firebase-config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="aws-exports.js"><span>aws-exports.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="amplify-config.js"><span>amplify-config.js</span></label>
+                                </div>
+                            </div>
+
+                            <!-- Framework Configs -->
+                            <div class="preset-category">
+                                <div class="category-header" data-category="framework">
+                                    <span class="category-icon">🛠</span>
+                                    <span>Framework Configs</span>
+                                    <span class="category-count">0</span>
+                                </div>
+                                <div class="category-items" id="preset-framework">
+                                    <label class="preset-item"><input type="checkbox" value="nuxt.config.js"><span>nuxt.config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="next.config.js"><span>next.config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="vite.config.js"><span>vite.config.js</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="webpack.config.js"><span>webpack.config.js</span></label>
+                                </div>
+                            </div>
+
+                            <!-- Manifests -->
+                            <div class="preset-category">
+                                <div class="category-header" data-category="manifest">
+                                    <span class="category-icon">📋</span>
+                                    <span>Manifests & Meta</span>
+                                    <span class="category-count">0</span>
+                                </div>
+                                <div class="category-items" id="preset-manifest">
+                                    <label class="preset-item"><input type="checkbox" value="manifest.json"><span>manifest.json</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="metadata.json"><span>metadata.json</span></label>
+                                    <label class="preset-item"><input type="checkbox" value="package.json"><span>package.json</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Filename -->
+                    <div class="form-section">
+                        <label class="form-label">CUSTOM FILENAME</label>
+                        <div class="custom-filename-wrapper">
+                            <input type="text" id="custom-filename" class="form-input" placeholder="custom-file.js">
+                            <button class="btn btn-sm" id="btn-add-custom">ADD</button>
+                        </div>
+                        <div id="custom-files-list" class="custom-files-list"></div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-large" id="btn-hunt">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            INITIATE HUNT
+                        </button>
+                        <button class="btn btn-secondary" id="btn-generate-queries">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 18 22 12 16 6"/>
+                                <polyline points="8 6 2 12 8 18"/>
+                            </svg>
+                            GENERATE QUERIES
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Panel - Dashboard -->
+            <section class="panel panel-center">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="3" y1="9" x2="21" y2="9"/>
+                            <line x1="9" y1="21" x2="9" y2="9"/>
+                        </svg>
+                        INTELLIGENCE DASHBOARD
+                    </h2>
+                    <div class="panel-actions">
+                        <span class="result-count" id="result-count">0 RESULTS</span>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <!-- Query Preview Section -->
+                    <div class="dashboard-section" id="query-section">
+                        <div class="section-header">
+                            <h3>GENERATED QUERIES</h3>
+                            <div class="section-actions">
+                                <button class="btn btn-sm" id="btn-copy-all-queries">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    </svg>
+                                    COPY ALL
+                                </button>
+                            </div>
+                        </div>
+                        <div class="query-list" id="query-list">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <polyline points="16 18 22 12 16 6"/>
+                                    <polyline points="8 6 2 12 8 18"/>
+                                </svg>
+                                <p>Enter a target domain and select files to generate queries</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div class="dashboard-section" id="results-section">
+                        <div class="section-header">
+                            <h3>SCAN RESULTS</h3>
+                            <div class="section-actions">
+                                <select class="filter-select" id="filter-severity">
+                                    <option value="all">All Severities</option>
+                                    <option value="high">High</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="low">Low</option>
+                                    <option value="info">Informational</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="results-grid" id="results-grid">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                <p>No scan results yet. Initiate a hunt to begin analysis.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel - Analysis -->
+            <aside class="panel panel-right">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        ANALYSIS & REPORT
+                    </h2>
+                </div>
+                <div class="panel-content">
+                    <!-- Finding Details -->
+                    <div class="analysis-section" id="finding-details">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <p>Select a result to view analysis details</p>
+                        </div>
+                    </div>
+
+                    <!-- Report Generator -->
+                    <div class="analysis-section" id="report-section" style="display: none;">
+                        <h3 class="section-title">REPORT CONFIGURATION</h3>
+                        
+                        <div class="form-section">
+                            <label class="form-label">REPORT TEMPLATE</label>
+                            <select id="report-template" class="form-select">
+                                <option value="generic">Generic Responsible Disclosure</option>
+                                <option value="hackerone">HackerOne Style</option>
+                                <option value="bugcrowd">Bugcrowd Style</option>
+                                <option value="yeswehack">YesWeHack Style</option>
+                            </select>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">OUTPUT FORMAT</label>
+                            <div class="format-buttons">
+                                <button class="format-btn active" data-format="markdown">Markdown</button>
+                                <button class="format-btn" data-format="text">Plain Text</button>
+                            </div>
+                        </div>
+
+                        <div class="report-preview" id="report-preview">
+                            <div class="preview-header">
+                                <span>REPORT PREVIEW</span>
+                                <button class="btn-icon" id="btn-expand-preview" title="Expand">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="15 3 21 3 21 9"/>
+                                        <polyline points="9 21 3 21 3 15"/>
+                                        <line x1="21" y1="3" x2="14" y2="10"/>
+                                        <line x1="3" y1="21" x2="10" y2="14"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="preview-content" id="preview-content">
+                                <!-- Report content will be rendered here -->
+                            </div>
+                        </div>
+
+                        <div class="report-actions">
+                            <button class="btn btn-primary" id="btn-copy-report">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                                COPY REPORT
+                            </button>
+                            <button class="btn btn-secondary" id="btn-download-txt">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                .TXT
+                            </button>
+                            <button class="btn btn-secondary" id="btn-download-md">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                .MD
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Bottom Terminal -->
+        <footer class="terminal-bar">
+            <div class="terminal-header">
+                <span class="terminal-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="4 17 10 11 4 5"/>
+                        <line x1="12" y1="19" x2="20" y2="19"/>
+                    </svg>
+                    SYSTEM LOG
+                </span>
+                <button class="btn-icon" id="btn-clear-terminal" title="Clear Log">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="terminal-content" id="terminal-content">
+                <div class="terminal-line">
+                    <span class="terminal-time">[--:--:--]</span>
+                    <span class="terminal-msg">RECON SENTINEL initialized. Awaiting commands...</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Response Inspector Modal -->
+    <div id="inspector-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    RESPONSE INSPECTOR
+                </h2>
+                <button class="modal-close" id="close-inspector">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="inspector-grid">
+                    <div class="inspector-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">URL</span>
+                            <span class="meta-value" id="inspector-url">-</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Filename</span>
+                            <span class="meta-value" id="inspector-filename">-</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Size</span>
+                            <span class="meta-value" id="inspector-size">-</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Scan Time</span>
+                            <span class="meta-value" id="inspector-time">-</span>
+                        </div>
+                    </div>
+                    <div class="inspector-content">
+                        <div class="content-header">
+                            <span>RESPONSE DATA</span>
+                            <div class="content-actions">
+                                <button class="btn btn-sm" id="btn-copy-content">Copy</button>
+                            </div>
+                        </div>
+                        <div class="content-body">
+                            <pre id="inspector-data" class="code-block"></pre>
+                        </div>
+                    </div>
+                    <div class="inspector-findings">
+                        <h3>DETECTED PATTERNS</h3>
+                        <div id="inspector-patterns" class="pattern-list">
+                            <!-- Patterns will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-mark-irrelevant">Mark Irrelevant</button>
+                <button class="btn btn-secondary" id="btn-needs-review">Needs Review</button>
+                <button class="btn btn-primary" id="btn-generate-report">Generate Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    SETTINGS
+                </h2>
+                <button class="modal-close" id="close-settings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3>API Configuration</h3>
+                    <div class="form-section">
+                        <label class="form-label">URLSCAN API KEY <span class="optional">(optional)</span></label>
+                        <input type="password" id="api-key" class="form-input" placeholder="Enter your API key for higher rate limits">
+                        <p class="form-hint">API key is stored locally and never sent to any server except urlscan.io</p>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>Display</h3>
+                    <div class="form-section">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="setting-animations" checked>
+                            <span class="toggle-switch"></span>
+                            <span>Enable Animations</span>
+                        </label>
+                    </div>
+                    <div class="form-section">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="setting-sound">
+                            <span class="toggle-switch"></span>
+                            <span>Sound Effects</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>Data</h3>
+                    <div class="form-section">
+                        <button class="btn btn-danger" id="btn-clear-data">Clear All Local Data</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12,6 12,12 16,14"/>
+                    </svg>
+                    SCAN HISTORY
+                </h2>
+                <button class="modal-close" id="close-history">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="history-list" class="history-list">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12,6 12,12 16,14"/>
+                        </svg>
+                        <p>No scan history yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    METHODOLOGY & HELP
+                </h2>
+                <button class="modal-close" id="close-help">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-content">
+                    <section class="help-section">
+                        <h3>Overview</h3>
+                        <p>RECON SENTINEL is a passive reconnaissance tool that helps authorized security researchers analyze publicly available data from urlscan.io to identify potentially exposed configuration files and sensitive data.</p>
+                    </section>
+                    
+                    <section class="help-section">
+                        <h3>Methodology</h3>
+                        <ol>
+                            <li><strong>Query Generation</strong> - Build urlscan.io search queries targeting common config file patterns</li>
+                            <li><strong>Public Data Analysis</strong> - Review publicly visible scan results from urlscan.io</li>
+                            <li><strong>Pattern Detection</strong> - Apply heuristic rules to identify potentially sensitive data</li>
+                            <li><strong>Report Generation</strong> - Create professional responsible disclosure drafts</li>
+                        </ol>
+                    </section>
+                    
+                    <section class="help-section">
+                        <h3>Heuristic Engine</h3>
+                        <p>The sensitivity detection engine looks for patterns that MAY indicate sensitive data exposure:</p>
+                        <ul>
+                            <li>API endpoint patterns</li>
+                            <li>Internal hostnames and IPs (RFC1918)</li>
+                            <li>Cloud service configurations (Firebase, AWS, etc.)</li>
+                            <li>Environment indicators (staging, dev, test)</li>
+                            <li>Authentication-related references</li>
+                            <li>Webhook and callback URLs</li>
+                            <li>Source map references</li>
+                        </ul>
+                        <p class="warning">⚠️ Detections are POTENTIAL findings only. Manual review is always required.</p>
+                    </section>
+                    
+                    <section class="help-section">
+                        <h3>API Limits</h3>
+                        <p>urlscan.io has rate limits for their public API:</p>
+                        <ul>
+                            <li><strong>Without API key:</strong> Limited requests, may encounter rate limiting</li>
+                            <li><strong>With free API key:</strong> Higher limits, recommended for regular use</li>
+                        </ul>
+                        <p>Get a free API key at <a href="https://urlscan.io/user/signup" target="_blank" rel="noopener">urlscan.io</a></p>
+                    </section>
+                    
+                    <section class="help-section">
+                        <h3>Responsible Use</h3>
+                        <ul>
+                            <li>Only analyze targets you are authorized to test</li>
+                            <li>Follow responsible disclosure practices</li>
+                            <li>Never exploit or access target systems</li>
+                            <li>Report findings through proper channels</li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Preview Modal -->
+    <div id="report-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    FULL REPORT
+                </h2>
+                <button class="modal-close" id="close-report">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="report-full-preview" id="report-full-preview">
+                    <!-- Full report content -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-modal-copy-report">Copy to Clipboard</button>
+                <button class="btn btn-secondary" id="btn-modal-download-txt">Download .txt</button>
+                <button class="btn btn-primary" id="btn-modal-download-md">Download .md</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/heuristics.js"></script>
+    <script src="js/urlscan.js"></script>
+    <script src="js/reports.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
